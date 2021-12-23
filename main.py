@@ -1,139 +1,99 @@
-import math
+import random
 
-rnd = 2 #знаков после запятой
+# вывод поля
+def out(m):
+    print(' |A|B|C|D|E|F|G|H|')
+    print('------------------')
+    k = 0
+    for i in m:
+        k += 1
+        print(str(k) + '|', end='')
+        for l in i:
+            if l == 0:
+                print(' |', end='')
+            else:
+                print('@|', end='')
+        print()
+        print('------------------')
 
-def toratio(n): #перевод десятичной дроби в обыкновенную
-    a = n.as_integer_ratio()
-    p = int(round(a[1] / a[0], rnd) * 100)
-    x = math.gcd(p, 100)
-    return 100 // x, p // x
+# чей ход
+def hod(i):
+    if i:
+        return 'Первый'
+    return 'Второй'
 
-def inp(): #ввод стандартной формы
-    x = [1, 1]
-    s = input().strip(' ')
-    if s[0] == '-':
-        x[0] *= -1
-        s = s.lstrip('-')
-    if s.find('+') != -1:
-        s = s.split('+')
-    else:
-        s = s.split('-')
-        x[1] *= -1
-    s[0] = s[0].strip(' ')
-    s[1] = s[1].strip(' ').strip('i')
-    x[0] *= float(s[0])
-    x[1] *= float(s[1])
-    return x
+def check1(m, a):
+    for i in range(n):
+        if m[a][i] == 1:
+            return True
+    return False
 
-def inpt(): #ввод тригонометрической формы
-    x = input().split(' ')
-    return float(x[0]), float(x[1])
+def check2(m, a):
+    for i in range(n):
+        if m[i][a] == 1:
+            return True
+    return False
 
-def out(z): #вывод стандартной формы
-    if z[1] < 0:
-        return str(round(z[0], rnd)) + ' - ' + str(round(-1 * z[1], rnd)) + 'i'
-    return str(round(z[0], rnd)) + ' + ' + str(round(z[1], rnd)) + 'i'
+# убрать столбец
+def del1(m, k, a):
+    for i in range(n):
+        k -= m[a][i]
+        m[a][i] = 0
+    return m, k
 
-def outt(z): #вывод тригонометрической формы в радианах
-    return str(round(z[0], rnd)) + '(sin' + str(round(z[1], rnd)) + ' + icos' + str(round(z[1], rnd)) + ')'
+# уббрать строку
+def del2(m, k, a):
+    for i in range(n):
+        k -= m[i][a]
+        m[i][a] = 0
+    return m, k
 
-def outt2(z): #вывод тригонометрической формы в градусах
-    return str(round(z[0], rnd)) + '(sin' + str(round(math.degrees(z[1]), rnd))+ '\N{DEGREE SIGN}' \
-           + ' + icos' + str(round(math.degrees(z[1]), rnd)) + '\N{DEGREE SIGN}' + ')'
+n = 8 # размер поля от 1 до 9
+r = 1 # коэффициент рандома кмани:пустоте = 1:r
+k = 0 # счётчик кол-ва оставшихся камней
+m = []
 
-def oute(z): #вывод показательной формы
-    return str(round(z[0], rnd)) + 'e^' + str(round(z[1], rnd)) + 'i'
+# генерация поля
+for i in range(n):
+    x = []
+    for l in range(n):
+        x.append(random.randint(0, r) // r)
+        k += x[-1]
+    m.append(x)
 
-def cn(z): #сопряжённое число
-    return z[0], -z[1]
-
-def sm(z, x): #сумма
-    return z[0] + x[0], z[1] + x[1]
-
-def df(z, x): #разность
-    return z[0] - x[0], z[1] - x[1]
-
-def mp(z, x): #умножение
-    return z[0] * x[0] - z[1] * x[1], z[0] * x[1] + z[1] * x[0]
-
-def dv(z, x): #деление
-    r = x[0] ** 2 + x[1] ** 2
-    z = mp(z, cn(x))
-    return z[0] / r, z[1] / r
-
-def tr(z): #трнигонометрическая форма
-    r = (z[0] ** 2 + z[1] ** 2) ** 0.5
-    g = math.atan2(z[1], z[0])
-    return r, g
-
-def ex(z, x): #степень
-    y = z
-    for i in range(x - 1):
-        z = mp(z, y)
-    return z
-
-def rt(z, x): #корень
-    z = tr(z)
-    r = z[0] ** (1/x)
-    a = []
-    for i in range(x):
-        f = ((z[1] + 2 * math.pi * i) / x) % (2 * math.pi)
-        a.append([r, f])
-    return a
-
-def ts(x): #из тригонометрической формы в радинах в стандартную форму
-    return x[0] * math.sin(x[1]), x[0] * math.cos(x[1])
-
-def ts2(x): #из тригонометрической формы в градусах в стандартную форму
-    return x[0] * math.sin(math.radians(x[1])), x[0] * math.cos(math.radians(x[1]))
-
-z = inp()
-while True:
-    c = input()
-    if c == '+':
-        x = inp()
-        z = sm(z, x)
-    elif c == '-':
-        x = inp()
-        z = df(z, x)
-    elif c == '*':
-        x = inp()
-        z = mp(z, x)
-    elif c == '/':
-        x = inp()
-        if x[0] == 0 and x[1] == 0:
-            print("You cannot divide by zero")
-        else:
-            z = dv(z, x)
-    elif c == 'c':
-        z = cn(z)
-    elif c == 't':
-        print(outt(tr(z)))
-    elif c == 't2':
-        print(outt2(tr(z)))
-    elif c == '^' or c == '**':
-        x = int(input())
-        z = ex(z, x)
-    elif c == 'r':
-        x = int(input())
-        for f in rt(z, x):
-            print(outt(f))
-    elif c == 'r2':
-        x = int(input())
-        for f in rt(z, x):
-            print(outt2(f))
-    elif c == 'e':
-        print(oute(tr(z)))
-    elif c == '0':
-        z = inp()
-    elif c == 's':
-        x = inpt()
-        z = ts(x)
-    elif c == 's2':
-        x = inpt()
-        z = ts2(x)
-    elif c == 'esc':
+i = False
+print('Начало игры')
+while k > 0:
+    i = not i
+    out(m)
+    print(hod(i) + ' игрок ходит')
+    # print(k)
+    a = input().lower()
+    if a == 'end':
+        print('Игра преждевременно завершена')
         break
+    if len(a) > 1:
+        print('Невозможный ход')
+        i = not i
+        continue
+    if ord(a) >= ord('a') and ord(a) <= ord('h'):
+        if check2(m, ord(a) - ord('a')):
+            m, k = del2(m, k, ord(a) - ord('a'))
+        else:
+            print('Столбец уже пуст')
+            i = not i
+    elif ord(a) >= ord('1') and ord(a) <= ord(str(n)):
+        if check1(m, int(a) - 1):
+            m, k = del1(m, k, int(a) - 1)
+        else:
+            print('Строка уже пуста')
+            i = not i
     else:
-        print('You specified the wrong command')
-    print(out(z))
+        print('Неверный ход')
+        i = not i
+if k == 0:
+    print(hod(i)+' игрок победил!')
+
+
+
+
